@@ -6,6 +6,7 @@ import '../controllers/drag_controller.dart';
 import '../controllers/launcher_controller.dart';
 import '../services/launcher_service.dart';
 import '../models/app_model.dart';
+import 'package:flutter/gestures.dart';
 
 class AppIcon extends ConsumerWidget {
   final AppModel app;
@@ -100,3 +101,4 @@ class AppIcon extends ConsumerWidget {
     );
   }
 }
+
