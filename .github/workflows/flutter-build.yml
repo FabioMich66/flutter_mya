@@ -16,8 +16,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
-          flutter-version: 3.19.0  # oppure usa flutter-version-file: pubspec.yaml
+          flutter-version: '3.38.9'  # oppure usa flutter-version-file: pubspec.yaml
 
       - name: Flutter version
         run: flutter --version
