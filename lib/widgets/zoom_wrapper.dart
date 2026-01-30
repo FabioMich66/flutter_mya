@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/zoom_controller.dart';
 import '../controllers/edit_controller.dart';
+import 'package:flutter/gestures.dart';
 
 class ZoomWrapper extends ConsumerStatefulWidget {
   final Widget child;
@@ -49,3 +50,4 @@ class _ZoomWrapperState extends ConsumerState<ZoomWrapper> {
     );
   }
 }
+
