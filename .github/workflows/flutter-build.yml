@@ -14,7 +14,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.9'  # oppure usa flutter-version-file: pubspec.yaml
+          flutter-version: '3.38.9'
 
       - name: Flutter version
         run: flutter --version
@@ -28,6 +28,8 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
-      # Per iOS (solo su macOS)
-      # - name: Build iOS
-      #   run: flutter build ipa --release
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
