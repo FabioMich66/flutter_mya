@@ -1,3 +1,4 @@
+import 'package:launcher_flutter/pages/launcher_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/config_controller.dart';
@@ -46,5 +47,6 @@ class SetupPage extends ConsumerWidget {
     );
   }
 }
+
 
 
