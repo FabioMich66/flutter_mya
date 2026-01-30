@@ -23,7 +23,7 @@ class SetupPage extends ConsumerWidget {
             TextField(controller: passCtrl, decoration: const InputDecoration(labelText: 'Password')),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final cfg = ConfigModel(
                   uri: uriCtrl.text,
                   user: userCtrl.text,
@@ -46,3 +46,4 @@ class SetupPage extends ConsumerWidget {
     );
   }
 }
+
