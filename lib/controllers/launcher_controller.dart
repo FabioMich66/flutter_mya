@@ -1,3 +1,4 @@
+import '../utils/image_utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/app_model.dart';
 import '../services/api_service.dart';
@@ -94,3 +95,4 @@ class LauncherController extends Notifier<LauncherState> {
     state = LauncherState(apps: state.apps, order: newOrder);
   }
 }
+
