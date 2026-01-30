@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:image/image.dart' as img;
+import 'package:webp/webp.dart' as webp;
 
 class ImageUtils {
   static Future<List<int>?> pickAndProcessIcon() async {
@@ -21,8 +22,7 @@ class ImageUtils {
         height: side);
 
     final resized = img.copyResize(crop, width: 256, height: 256);
-
-    return img.encodeWebP(resized, quality: 90);
+    return webp.encodeWebP(resized);
   }
 
   static String bytesToDataUrl(List<int> bytes) {
@@ -30,3 +30,4 @@ class ImageUtils {
     return 'data:image/webp;base64,$base64';
   }
 }
+
