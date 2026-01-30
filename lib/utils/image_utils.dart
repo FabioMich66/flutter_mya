@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:image/image.dart' as img;
+import 'package:flutter_image_converter/flutter_image_converter.dart';
 
 class ImageUtils {
   static Future<List<int>?> pickAndProcessIcon() async {
@@ -25,8 +26,16 @@ class ImageUtils {
 
     final resized = img.copyResize(crop, width: 256, height: 256);
 
-    // WebP universale (image 4.1.3)
-    final webpBytes = img.encodeWebP(resized, quality: 90);
+    // PNG temporaneo
+    final pngBytes = img.encodePng(resized);
+
+    // Conversione universale PNG → WebP
+    final webpBytes = await FlutterImageConverter.convert(
+      pngBytes,
+      ImageFormat.png,
+      ImageFormat.webp,
+      quality: 90,
+    );
 
     return webpBytes;
   }
