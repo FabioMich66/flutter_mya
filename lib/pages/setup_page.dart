@@ -29,7 +29,14 @@ class SetupPage extends ConsumerWidget {
                   user: userCtrl.text,
                   password: passCtrl.text,
                 );
-                ref.read(configProvider.notifier).save(cfg);
+                final ok = await ref.read(configProvider.notifier).saveAndLogin(cfg);
+                if (ok && context.mounted) {
+                   Navigator.pushReplacement(
+                     context,
+                     MaterialPageRoute(builder: (_) => const LauncherPage()),
+                  );
+                }
+
               },
               child: const Text('Salva'),
             ),
