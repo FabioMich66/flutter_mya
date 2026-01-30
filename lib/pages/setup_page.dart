@@ -33,7 +33,7 @@ class SetupPage extends ConsumerWidget {
                 if (ok && context.mounted) {
                    Navigator.pushReplacement(
                      context,
-                     MaterialPageRoute(builder: (_) => const LauncherPage()),
+                     MaterialPageRoute(builder: (_) => LauncherPage()),
                   );
                 }
 
@@ -46,4 +46,5 @@ class SetupPage extends ConsumerWidget {
     );
   }
 }
+
 
