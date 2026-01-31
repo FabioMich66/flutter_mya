@@ -14,7 +14,7 @@ class ZoomWrapper extends ConsumerStatefulWidget {
 }
 
 class _ZoomWrapperState extends ConsumerState<ZoomWrapper> {
-  double initialZoom = 1.0;
+  double gestureStartZoom = 1.0;
 
   @override
   Widget build(BuildContext context) {
@@ -25,29 +25,34 @@ class _ZoomWrapperState extends ConsumerState<ZoomWrapper> {
       onPointerSignal: (signal) {
         if (!editMode) return;
         if (signal is PointerScrollEvent) {
-          final direction = signal.scrollDelta.dy < 0 ? 1 : -1;
-          final factor = 1 + direction * 0.1;
           final current = ref.read(zoomProvider);
+          final direction = signal.scrollDelta.dy < 0 ? 1 : -1;
+          final factor = 1 + direction * 0.08; // più morbido
           final newZoom = zoomCtrl.applyElastic(current * factor);
           zoomCtrl.applyZoom(newZoom);
         }
       },
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+
         onScaleStart: editMode
             ? (details) {
-                initialZoom = ref.read(zoomProvider);
+                gestureStartZoom = ref.read(zoomProvider);
               }
             : null,
+
         onScaleUpdate: editMode
             ? (details) {
-                final zoomCtrl = ref.read(zoomProvider.notifier);
-                final newZoom = zoomCtrl.applyElastic(initialZoom * details.scale);
+                // scale relativo → convertito in assoluto
+                final newZoom = zoomCtrl.applyElastic(
+                  gestureStartZoom * details.scale,
+                );
                 zoomCtrl.applyZoom(newZoom);
               }
             : null,
+
         child: widget.child,
       ),
     );
   }
 }
-
