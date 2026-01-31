@@ -13,6 +13,7 @@ class AppModel {
     this.iconDataUrl,
   });
 
+  // MODEL → JSON (per salvataggio locale)
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
@@ -20,18 +21,23 @@ class AppModel {
         'icon': iconDataUrl,
       };
 
+  // JSON → MODEL (compatibile con backend attuale)
   factory AppModel.fromJson(Map<String, dynamic> json) {
     String? iconDataUrl;
 
     final icon = json['icon'];
 
-    // Il backend manda:
-    // icon: { data: "<BASE64>", mime: "image/webp", size: 2126 }
+    // Caso reale del backend:
+    // icon.data = { type: "Buffer", data: [...] }
     if (icon is Map &&
-        icon['data'] is String &&
+        icon['data'] is Map &&
+        icon['data']['data'] is List &&
         icon['mime'] is String) {
-      final base64 = icon['data'];
+
+      final bytes = List<int>.from(icon['data']['data']);
       final mime = icon['mime'];
+      final base64 = base64Encode(bytes);
+
       iconDataUrl = "data:$mime;base64,$base64";
     }
 
