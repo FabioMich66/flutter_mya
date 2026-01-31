@@ -14,51 +14,97 @@ class ContextMenuOverlay extends ConsumerWidget {
 
     if (!menu.visible) return const SizedBox.shrink();
 
-    return Positioned(
-      left: menu.position.dx,
-      top: menu.position.dy,
-      child: Material(
-        elevation: 8,
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _item(context, ref, 'Rinomina', () async {
-              final id = menu.targetId!;
-              final launcher = ref.read(launcherProvider);
-              final app = launcher.apps.firstWhere((a) => a.id == id);
+    final screen = MediaQuery.of(context).size;
 
-              final newName = await showDialog<String>(
-                context: context,
-                builder: (_) => RenameDialog(initial: app.name),
-              );
+    // dimensioni menu
+    const double menuWidth = 180;
+    const double menuHeight = 150;
 
-              if (newName != null && newName.trim().isNotEmpty) {
-                ref.read(launcherProvider.notifier).renameApp(id, newName.trim());
-              }
+    // clamp posizione per evitare overflow
+    final dx = menu.position.dx.clamp(0, screen.width - menuWidth);
+    final dy = menu.position.dy.clamp(0, screen.height - menuHeight);
 
-              ref.read(contextMenuProvider.notifier).hide();
-            }),
-            _item(context, ref, 'Cambia icona', () async {
-              final id = menu.targetId!;
-              final bytes = await ImageUtils.pickAndProcessIcon();
-              if (bytes != null) {
-                ref.read(launcherProvider.notifier).changeIcon(id, bytes);
-              }
-              ref.read(contextMenuProvider.notifier).hide();
-            }),
-            _item(context, ref, 'Rimuovi', () async {
-              final id = menu.targetId!;
-              ref.read(launcherProvider.notifier).removeApp(id);
-              ref.read(contextMenuProvider.notifier).hide();
-            }),
-          ],
+    return Stack(
+      children: [
+        // tappo per chiudere
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: () => ref.read(contextMenuProvider.notifier).hide(),
+            behavior: HitTestBehavior.translucent,
+          ),
         ),
-      ),
+
+        // menu
+        Positioned(
+          left: dx,
+          top: dy,
+          child: AnimatedScale(
+            scale: 1,
+            duration: const Duration(milliseconds: 120),
+            child: Material(
+              elevation: 8,
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                width: menuWidth,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _item(context, ref, 'Rinomina', () async {
+                      final id = menu.targetId!;
+                      final launcher = ref.read(launcherProvider);
+
+                      final app = launcher.apps.firstWhere(
+                        (a) => a.id == id,
+                        orElse: () => null,
+                      );
+
+                      if (app == null) {
+                        ref.read(contextMenuProvider.notifier).hide();
+                        return;
+                      }
+
+                      final newName = await showDialog<String>(
+                        context: context,
+                        builder: (_) => RenameDialog(initial: app.name),
+                      );
+
+                      if (newName != null && newName.trim().isNotEmpty) {
+                        ref.read(launcherProvider.notifier)
+                            .renameApp(id, newName.trim());
+                      }
+
+                      ref.read(contextMenuProvider.notifier).hide();
+                    }),
+
+                    _item(context, ref, 'Cambia icona', () async {
+                      final id = menu.targetId!;
+                      final bytes = await ImageUtils.pickAndProcessIcon();
+
+                      if (bytes != null) {
+                        ref.read(launcherProvider.notifier)
+                            .changeIcon(id, bytes);
+                      }
+
+                      ref.read(contextMenuProvider.notifier).hide();
+                    }),
+
+                    _item(context, ref, 'Rimuovi', () async {
+                      final id = menu.targetId!;
+                      ref.read(launcherProvider.notifier).removeApp(id);
+                      ref.read(contextMenuProvider.notifier).hide();
+                    }),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _item(BuildContext context, WidgetRef ref, String label, VoidCallback onTap) {
+  Widget _item(
+      BuildContext context, WidgetRef ref, String label, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       child: Padding(
