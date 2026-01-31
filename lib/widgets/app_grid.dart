@@ -21,29 +21,43 @@ class AppGrid extends ConsumerWidget {
     final iconSize = 80 * zoom;
     final spacing = 20 * zoom;
 
+    final width = MediaQuery.of(context).size.width;
+    final columns = (width / (iconSize + spacing)).clamp(2, 10).floor();
+
     return GridView.builder(
       padding: EdgeInsets.all(spacing),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: (MediaQuery.of(context).size.width / (iconSize + spacing)).floor().clamp(2, 10),
+        crossAxisCount: columns,
         crossAxisSpacing: spacing,
         mainAxisSpacing: spacing,
         childAspectRatio: 0.8,
       ),
       itemCount: order.length,
       itemBuilder: (_, i) {
+        // sicurezza: se l’indice è fuori range
+        if (i >= order.length) return const SizedBox();
+
         final id = order[i];
-        final app = apps.firstWhere((a) => a.id == id);
+
+        // sicurezza: se l’app non esiste più
+        final app = apps.firstWhere(
+          (a) => a.id == id,
+          orElse: () => AppModel(
+            id: id,
+            name: 'Unknown',
+            url: '',
+            iconDataUrl: null,
+          ),
+        );
 
         final isPlaceholder =
-            drag.draggingId != null && drag.overIndex == i && editMode;
+            editMode &&
+            drag.draggingId != null &&
+            drag.overIndex == i &&
+            drag.overIndex! < order.length;
 
         if (isPlaceholder) {
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16 * zoom),
-              border: Border.all(color: Colors.blue.withOpacity(0.4), width: 2),
-            ),
-          );
+          return _PlaceholderIcon(zoom: zoom);
         }
 
         return AppIcon(app: app, index: i, zoom: zoom);
@@ -52,15 +66,15 @@ class AppGrid extends ConsumerWidget {
   }
 }
 
-
 class _PlaceholderIcon extends StatelessWidget {
-  const _PlaceholderIcon();
+  final double zoom;
+  const _PlaceholderIcon({required this.zoom});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16 * zoom),
         border: Border.all(color: Colors.blue.withOpacity(0.4), width: 2),
       ),
     );
