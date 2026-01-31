@@ -8,5 +8,10 @@ class EditController extends Notifier<bool> {
   bool build() => false;
 
   void enter() => state = true;
+
   void exit() => state = false;
+
+  void toggle() => state = !state;
+
+  void setMode(bool value) => state = value;
 }
