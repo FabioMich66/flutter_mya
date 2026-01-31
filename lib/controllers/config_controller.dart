@@ -4,45 +4,33 @@ import '../services/storage_service.dart';
 import '../services/api_service.dart';
 
 final configProvider =
-    NotifierProvider<ConfigController, ConfigState>(() => ConfigController());
+    AsyncNotifierProvider<ConfigController, ConfigModel?>(() => ConfigController());
 
-class ConfigState {
-  final ConfigModel? config;
-  final bool loading;
-  final String? error;
-
-  bool get isConfigured => config != null;
-
-  ConfigState({this.config, this.loading = false, this.error});
-}
-
-class ConfigController extends Notifier<ConfigState> {
+class ConfigController extends AsyncNotifier<ConfigModel?> {
   final storage = StorageService();
   final api = ApiService();
 
   @override
-  ConfigState build() {
-    _load();
-    return ConfigState();
-  }
-
-  Future<void> _load() async {
+  Future<ConfigModel?> build() async {
+    // Carica la configurazione all'avvio
     final cfg = await storage.loadConfig();
-    state = ConfigState(config: cfg);
+    return cfg;
   }
 
   Future<bool> saveAndLogin(ConfigModel config) async {
-    state = ConfigState(config: null, loading: true);
+    state = const AsyncLoading();
 
     final token = await api.login(config);
 
     if (token == null) {
-      state = ConfigState(error: 'Credenziali errate');
+      state = AsyncError("Credenziali errate", StackTrace.current);
       return false;
     }
 
     await storage.saveConfig(config);
-    state = ConfigState(config: config);
+
+    // Aggiorna lo stato con la nuova configurazione
+    state = AsyncData(config);
     return true;
   }
 }
