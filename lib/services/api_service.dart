@@ -48,7 +48,7 @@ class ApiService {
 
     if (json is! List) return [];
 
-    // Usa SEMPRE AppModel.fromJson per gestire icone Buffer/base64
+    // Parsing corretto: ogni elemento passa da AppModel.fromJson()
     return json.map<AppModel>((e) => AppModel.fromJson(e)).toList();
   }
 }
