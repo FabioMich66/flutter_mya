@@ -1,8 +1,8 @@
 class AppModel {
   final String id;
-  String name;
-  String url;
-  String? iconDataUrl; // base64 data URL
+  final String name;
+  final String url;
+  final String? iconDataUrl; // base64 data URL
 
   AppModel({
     required this.id,
@@ -11,6 +11,7 @@ class AppModel {
     this.iconDataUrl,
   });
 
+  // MODEL → JSON
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
@@ -18,10 +19,13 @@ class AppModel {
         'icon': iconDataUrl,
       };
 
-  factory AppModel.fromJson(Map<String, dynamic> json) => AppModel(
-        id: json['id'],
-        name: json['name'],
-        url: json['url'],
-        iconDataUrl: json['icon'],
-      );
+  // JSON → MODEL
+  factory AppModel.fromJson(Map<String, dynamic> json) {
+    return AppModel(
+      id: json['id'].toString(),     // sicurezza: sempre stringa
+      name: json['name'] ?? '',
+      url: json['url'] ?? '',
+      iconDataUrl: json['icon'],     // può essere null
+    );
+  }
 }
