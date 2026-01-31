@@ -18,6 +18,10 @@ class StorageService {
     return enc.Encrypter(enc.AES(key));
   }
 
+  // ------------------------------------------------------------
+  // CONFIG
+  // ------------------------------------------------------------
+
   Future<void> saveConfig(ConfigModel config) async {
     final prefs = await SharedPreferences.getInstance();
     final json = jsonEncode(config.toJson());
@@ -38,6 +42,10 @@ class StorageService {
       return null;
     }
   }
+
+  // ------------------------------------------------------------
+  // APPS
+  // ------------------------------------------------------------
 
   Future<void> saveApps(List<AppModel> apps) async {
     final prefs = await SharedPreferences.getInstance();
@@ -61,6 +69,10 @@ class StorageService {
     }
   }
 
+  // ------------------------------------------------------------
+  // ORDER
+  // ------------------------------------------------------------
+
   Future<void> saveOrder(List<String> order) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_orderKey, jsonEncode(order));
@@ -78,6 +90,10 @@ class StorageService {
     }
   }
 
+  // ------------------------------------------------------------
+  // ZOOM
+  // ------------------------------------------------------------
+
   Future<void> saveZoom(double zoom) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_zoomKey, zoom);
@@ -87,5 +103,16 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getDouble(_zoomKey);
   }
-}
 
+  // ------------------------------------------------------------
+  // RESET TOTALE
+  // ------------------------------------------------------------
+
+  Future<void> clearAll() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_configKey);
+    await prefs.remove(_appsKey);
+    await prefs.remove(_orderKey);
+    await prefs.remove(_zoomKey);
+  }
+}
