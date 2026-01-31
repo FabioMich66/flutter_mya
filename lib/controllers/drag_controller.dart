@@ -15,11 +15,12 @@ class DragState {
     String? draggingId,
     int? fromIndex,
     int? overIndex,
+    bool resetOverIndex = false,
   }) {
     return DragState(
       draggingId: draggingId ?? this.draggingId,
       fromIndex: fromIndex ?? this.fromIndex,
-      overIndex: overIndex ?? this.overIndex,
+      overIndex: resetOverIndex ? null : (overIndex ?? this.overIndex),
     );
   }
 }
@@ -32,11 +33,22 @@ class DragController extends Notifier<DragState> {
   DragState build() => const DragState();
 
   void start(String id, int index) {
-    state = DragState(draggingId: id, fromIndex: index, overIndex: index);
+    // evita drag multipli
+    if (state.draggingId != null) return;
+
+    state = DragState(
+      draggingId: id,
+      fromIndex: index,
+      overIndex: index,
+    );
   }
 
-  void hover(int index) {
+  void hover(int index, int maxIndex) {
     if (state.draggingId == null) return;
+
+    // evita indici invalidi
+    if (index < 0 || index >= maxIndex) return;
+
     state = state.copyWith(overIndex: index);
   }
 
