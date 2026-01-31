@@ -20,6 +20,7 @@ class ConfigController extends AsyncNotifier<ConfigModel?> {
   Future<bool> saveAndLogin(ConfigModel config) async {
     state = const AsyncLoading();
 
+    // 1. LOGIN → ottieni token
     final token = await api.login(config);
 
     if (token == null) {
@@ -27,10 +28,15 @@ class ConfigController extends AsyncNotifier<ConfigModel?> {
       return false;
     }
 
-    await storage.saveConfig(config);
+    // 2. Salva il token dentro il config
+    final updatedConfig = config.copyWith(token: token);
 
-    // Aggiorna lo stato con la nuova configurazione
-    state = AsyncData(config);
+    // 3. Salva la configurazione completa (URI, user, pass, token)
+    await storage.saveConfig(updatedConfig);
+
+    // 4. Aggiorna lo stato Riverpod
+    state = AsyncData(updatedConfig);
+
     return true;
   }
 }
