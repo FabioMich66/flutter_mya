@@ -45,15 +45,10 @@ class ApiService {
     if (res.statusCode != 200) return [];
 
     final json = jsonDecode(res.body);
-    final list = json as List;
 
-    return list
-        .map((e) => AppModel(
-              id: e['id'].toString(),
-              name: e['name'],
-              url: e['url'],
-              iconDataUrl: e['icon'],
-            ))
-        .toList();
+    if (json is! List) return [];
+
+    // Usa SEMPRE AppModel.fromJson per gestire icone Buffer/base64
+    return json.map<AppModel>((e) => AppModel.fromJson(e)).toList();
   }
 }
