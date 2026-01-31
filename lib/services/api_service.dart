@@ -8,10 +8,14 @@ class ApiService {
   Future<String?> login(ConfigModel config) async {
     final url = Uri.parse('${config.uri}/auth/login');
 
-    final res = await http.post(url, body: {
-      'email': config.user,
-      'password': config.password,
-    });
+    final res = await http.post(
+      url,
+      headers: { 'Content-Type': 'application/json' },
+      body: jsonEncode({
+        'email': config.user,
+        'password': config.password,
+      }),
+    );
 
     if (res.statusCode == 200) {
       final json = jsonDecode(res.body);
@@ -21,17 +25,21 @@ class ApiService {
     return null;
   }
 
-  Future<List<AppModel>> fetchApps(ConfigModel config) async {
+  Future<List<AppModel>> fetchApps(ConfigModel config, String token) async {
     final url = Uri.parse('${config.uri}/links');
 
-    final res = await http.get(url, headers: {
-      'Authorization': 'Bearer ${config.password}', // o token se lo salvi
-    });
+    final res = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
 
     if (res.statusCode != 200) return [];
 
     final json = jsonDecode(res.body);
-    final list = json['links'] as List;
+    final list = json as List;
 
     return list
         .map((e) => AppModel(
@@ -43,4 +51,6 @@ class ApiService {
         .toList();
   }
 }
+
+
 
