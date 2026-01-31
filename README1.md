@@ -141,28 +141,24 @@ Serve per generare icone o immagini ottimizzate per il launcher.
 
 ---
 
-# 🧩 Flusso generale dell’app
+## 🧩 Flusso generale dell’app
 
-Avvio app
-   ↓
-configProvider.build()
-   ↓
-Carica la configurazione salvata da StorageService
-   ↓
-Se la configurazione NON esiste → SetupPage
-Se la configurazione ESISTE → LauncherPage
-   ↓
-L’utente compila SetupPage e preme “Salva”
-   ↓
-saveAndLogin():
-    - tenta il login tramite ApiService
-    - se valido → salva la configurazione
-    - aggiorna lo stato con AsyncData(config)
-   ↓
-La UI rileva che configProvider ha un valore valido
-   ↓
-Navigazione automatica verso LauncherPage
-   ↓
-Al riavvio dell’app:
-    - configProvider ricarica la configurazione
-    - l’app salta SetupPage e apre direttamente LauncherPage
+Il comportamento dell’app segue una pipeline chiara basata sul caricamento asincrono della configurazione tramite Riverpod:
+
+1. **Avvio dell’app**
+2. `configProvider.build()` viene eseguito
+3. Viene caricata la configurazione salvata tramite `StorageService`
+4. **Se la configurazione NON esiste**
+   - viene mostrata la `SetupPage`
+5. **Se la configurazione ESISTE**
+   - viene mostrata la `LauncherPage`
+6. L’utente compila la `SetupPage` e preme **Salva**
+7. `saveAndLogin()`:
+   - tenta il login tramite `ApiService`
+   - se valido → salva la configurazione
+   - aggiorna lo stato con `AsyncData(config)`
+8. La UI rileva che `configProvider` ha un valore valido
+9. Navigazione automatica verso `LauncherPage`
+10. **Al riavvio dell’app**
+    - `configProvider` ricarica la configurazione
+    - l’app salta la SetupPage e apre direttamente la LauncherPage
