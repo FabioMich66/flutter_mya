@@ -5,6 +5,8 @@ import '../models/app_model.dart';
 import '../models/config_model.dart';
 
 class ApiService {
+  /// LOGIN — equivalente al vecchio JS:
+  /// fetch(`${state.URI}/auth/login`, { method: 'POST', body: JSON.stringify(...) })
   Future<String?> login(ConfigModel config) async {
     final url = Uri.parse('${config.uri}/auth/login');
 
@@ -17,6 +19,9 @@ class ApiService {
       }),
     );
 
+    print('LOGIN STATUS: ${res.statusCode}');
+    print('LOGIN BODY: ${res.body}');
+
     if (res.statusCode == 200) {
       final json = jsonDecode(res.body);
       return json['token'];
@@ -25,6 +30,8 @@ class ApiService {
     return null;
   }
 
+  /// FETCH APPS — equivalente al vecchio JS:
+  /// fetch(`${state.URI}/links`, { headers: { Authorization: Bearer token } })
   Future<List<AppModel>> fetchApps(ConfigModel config, String token) async {
     final url = Uri.parse('${config.uri}/links');
 
@@ -36,21 +43,11 @@ class ApiService {
       },
     );
 
+    print('APPS STATUS: ${res.statusCode}');
+    print('APPS BODY: ${res.body}');
+
     if (res.statusCode != 200) return [];
 
     final json = jsonDecode(res.body);
-    final list = json as List;
 
-    return list
-        .map((e) => AppModel(
-              id: e['id'].toString(),
-              name: e['name'],
-              url: e['url'],
-              iconDataUrl: e['icon'],
-            ))
-        .toList();
-  }
-}
-
-
-
+    // Il vecchio JS riceveva un array diretto
