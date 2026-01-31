@@ -33,47 +33,73 @@ class AppIcon extends ConsumerWidget {
         if (event.kind == PointerDeviceKind.mouse &&
             event.buttons == kSecondaryMouseButton &&
             editMode) {
-          final pos = Offset(event.position.dx, event.position.dy);
-          ref.read(contextMenuProvider.notifier).show(app.id, pos);
+          ref.read(contextMenuProvider.notifier).show(
+                app.id,
+                event.position,
+              );
         }
       },
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+
         onLongPress: () {
           if (editMode) {
             final box = context.findRenderObject() as RenderBox;
-            final pos = box.localToGlobal(Offset(size / 2, size));
+            final pos = box.localToGlobal(Offset(size * 0.5, size * 0.5));
             ref.read(contextMenuProvider.notifier).show(app.id, pos);
           } else {
             ref.read(editProvider.notifier).enter();
           }
         },
+
         onTap: () async {
           if (!editMode) {
             await LauncherService().openAsApp(app.url);
           }
         },
+
         onPanStart: editMode
             ? (details) {
                 ref.read(dragProvider.notifier).start(app.id, index);
               }
             : null,
+
         onPanUpdate: editMode
             ? (details) {
-                // TODO: migliorare hit test
+                final gridBox = context.findRenderObject() as RenderBox;
+                final local = gridBox.globalToLocal(details.globalPosition);
+
+                final launcher = ref.read(launcherProvider);
+                final appsCount = launcher.order.length;
+
+                final iconSize = size;
+                final spacing = 20 * zoom;
+                final cellSize = iconSize + spacing;
+
+                final col = (local.dx / cellSize).floor();
+                final row = (local.dy / cellSize).floor();
+
+                final columns = (gridBox.size.width / cellSize).floor().clamp(2, 10);
+                final newIndex = row * columns + col;
+
+                ref.read(dragProvider.notifier).hover(newIndex, appsCount);
               }
             : null,
+
         onPanEnd: editMode
             ? (details) {
                 final dragState = ref.read(dragProvider.notifier).end();
+
                 if (dragState.draggingId != null &&
                     dragState.fromIndex != null &&
                     dragState.overIndex != null) {
                   ref
                       .read(launcherProvider.notifier)
-                      .reorderByIndices(dragState.fromIndex!, dragState.overIndex!);
+                      .reorder(dragState.fromIndex!, dragState.overIndex!);
                 }
               }
             : null,
+
         child: Column(
           children: [
             SizedBox(
@@ -101,4 +127,3 @@ class AppIcon extends ConsumerWidget {
     );
   }
 }
-
