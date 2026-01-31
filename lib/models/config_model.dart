@@ -26,14 +26,24 @@ class ConfigModel {
   }
 
   // ------------------------------------------------------------
-  // JSON → MODEL
+  // JSON → MODEL (con validazione)
   // ------------------------------------------------------------
   factory ConfigModel.fromJson(Map<String, dynamic> json) {
+    final uri = json['uri']?.toString() ?? '';
+    final user = json['user']?.toString() ?? '';
+    final password = json['password']?.toString() ?? '';
+    final token = json['token']?.toString();
+
+    // Se i campi obbligatori sono vuoti → config NON valida
+    if (uri.isEmpty || user.isEmpty || password.isEmpty) {
+      throw Exception("Invalid config");
+    }
+
     return ConfigModel(
-      uri: json['uri'],
-      user: json['user'],
-      password: json['password'],
-      token: json['token'],
+      uri: uri,
+      user: user,
+      password: password,
+      token: token,
     );
   }
 
