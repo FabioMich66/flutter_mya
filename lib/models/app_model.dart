@@ -4,7 +4,7 @@ class AppModel {
   final String id;
   final String name;
   final String url;
-  final String? iconDataUrl;
+  final String? iconDataUrl; // data URL base64
 
   AppModel({
     required this.id,
@@ -25,13 +25,13 @@ class AppModel {
 
     final icon = json['icon'];
 
-    if (icon != null &&
+    // Il backend manda:
+    // icon: { data: "<BASE64>", mime: "image/webp", size: 2126 }
+    if (icon is Map &&
         icon['data'] is String &&
         icon['mime'] is String) {
-
       final base64 = icon['data'];
       final mime = icon['mime'];
-
       iconDataUrl = "data:$mime;base64,$base64";
     }
 
