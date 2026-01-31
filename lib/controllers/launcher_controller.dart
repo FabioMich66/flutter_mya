@@ -26,7 +26,7 @@ class LauncherController extends Notifier<LauncherState> {
   }
 
   Future<void> _load() async {
-    final cfg = ref.read(configProvider).config;
+    final cfg = ref.read(configProvider).value;
     if (cfg == null) return;
 
     final savedApps = await storage.loadApps();
@@ -95,4 +95,5 @@ class LauncherController extends Notifier<LauncherState> {
     state = LauncherState(apps: state.apps, order: newOrder);
   }
 }
+
 
