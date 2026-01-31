@@ -4,7 +4,7 @@ class AppModel {
   final String id;
   final String name;
   final String url;
-  final String? iconDataUrl; // base64 data URL
+  final String? iconDataUrl; // data URL base64
 
   AppModel({
     required this.id,
@@ -33,7 +33,7 @@ class AppModel {
         iconDataUrl = icon;
       }
 
-      // Caso 2: il backend manda un oggetto tipo Buffer
+      // Caso 2: il backend manda un oggetto tipo Buffer (Node.js)
       else if (icon is Map &&
           icon['data'] is Map &&
           icon['data']['data'] is List) {
@@ -44,8 +44,8 @@ class AppModel {
 
     return AppModel(
       id: json['id'].toString(),
-      name: json['name'] ?? '',
-      url: json['url'] ?? '',
+      name: json['name']?.toString() ?? '',
+      url: json['url']?.toString() ?? '',
       iconDataUrl: iconDataUrl,
     );
   }
