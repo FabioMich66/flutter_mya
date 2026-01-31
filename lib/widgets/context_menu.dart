@@ -4,6 +4,7 @@ import '../controllers/context_menu_controller.dart';
 import '../controllers/launcher_controller.dart';
 import '../utils/image_utils.dart';
 import 'rename_dialog.dart';
+import '../models/app_model.dart';
 
 class ContextMenuOverlay extends ConsumerWidget {
   const ContextMenuOverlay({super.key});
@@ -21,8 +22,8 @@ class ContextMenuOverlay extends ConsumerWidget {
     const double menuHeight = 150;
 
     // clamp posizione per evitare overflow
-    final dx = menu.position.dx.clamp(0, screen.width - menuWidth);
-    final dy = menu.position.dy.clamp(0, screen.height - menuHeight);
+    final dx = menu.position.dx.clamp(0, screen.width - menuWidth).toDouble();
+    final dy = menu.position.dy.clamp(0, screen.height - menuHeight).toDouble();
 
     return Stack(
       children: [
@@ -55,13 +56,13 @@ class ContextMenuOverlay extends ConsumerWidget {
 
                       final app = launcher.apps.firstWhere(
                         (a) => a.id == id,
-                        orElse: () => null,
+                        orElse: () => AppModel(
+                          id: id,
+                          name: 'Unknown',
+                          url: '',
+                          iconDataUrl: null,
+                        ),
                       );
-
-                      if (app == null) {
-                        ref.read(contextMenuProvider.notifier).hide();
-                        return;
-                      }
 
                       final newName = await showDialog<String>(
                         context: context,
@@ -69,7 +70,8 @@ class ContextMenuOverlay extends ConsumerWidget {
                       );
 
                       if (newName != null && newName.trim().isNotEmpty) {
-                        ref.read(launcherProvider.notifier)
+                        ref
+                            .read(launcherProvider.notifier)
                             .renameApp(id, newName.trim());
                       }
 
@@ -81,7 +83,8 @@ class ContextMenuOverlay extends ConsumerWidget {
                       final bytes = await ImageUtils.pickAndProcessIcon();
 
                       if (bytes != null) {
-                        ref.read(launcherProvider.notifier)
+                        ref
+                            .read(launcherProvider.notifier)
                             .changeIcon(id, bytes);
                       }
 
@@ -104,7 +107,11 @@ class ContextMenuOverlay extends ConsumerWidget {
   }
 
   Widget _item(
-      BuildContext context, WidgetRef ref, String label, VoidCallback onTap) {
+    BuildContext context,
+    WidgetRef ref,
+    String label,
+    VoidCallback onTap,
+  ) {
     return InkWell(
       onTap: onTap,
       child: Padding(
