@@ -142,3 +142,27 @@ Serve per generare icone o immagini ottimizzate per il launcher.
 ---
 
 # 🧩 Flusso generale dell’app
+
+Avvio app
+   ↓
+configProvider.build()
+   ↓
+Carica la configurazione salvata da StorageService
+   ↓
+Se la configurazione NON esiste → SetupPage
+Se la configurazione ESISTE → LauncherPage
+   ↓
+L’utente compila SetupPage e preme “Salva”
+   ↓
+saveAndLogin():
+    - tenta il login tramite ApiService
+    - se valido → salva la configurazione
+    - aggiorna lo stato con AsyncData(config)
+   ↓
+La UI rileva che configProvider ha un valore valido
+   ↓
+Navigazione automatica verso LauncherPage
+   ↓
+Al riavvio dell’app:
+    - configProvider ricarica la configurazione
+    - l’app salta SetupPage e apre direttamente LauncherPage
