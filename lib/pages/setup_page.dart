@@ -26,6 +26,10 @@ class _SetupPageState extends ConsumerState<SetupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final configState = ref.watch(configProvider);
+
+    final isLoading = configState.isLoading;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Configurazione')),
       body: Padding(
@@ -45,42 +49,56 @@ class _SetupPageState extends ConsumerState<SetupPage> {
               decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
+
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                final cfg = ConfigModel(
-                  uri: uriCtrl.text.trim(),
-                  user: userCtrl.text.trim(),
-                  password: passCtrl.text.trim(),
-                );
 
-                print("Saving config: $cfg");
+            // LOADING INDICATOR
+            if (isLoading)
+              const CircularProgressIndicator(),
 
-                final ok = await ref
-                    .read(configProvider.notifier)
-                    .saveAndLogin(cfg);
+            if (!isLoading)
+              ElevatedButton(
+                onPressed: () async {
+                  if (uriCtrl.text.trim().isEmpty ||
+                      userCtrl.text.trim().isEmpty ||
+                      passCtrl.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Compila tutti i campi"),
+                      ),
+                    );
+                    return;
+                  }
 
-                print("saveAndLogin returned: $ok");
-
-                if (!mounted) return;
-
-                if (ok) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LauncherPage(),
-                    ),
+                  final cfg = ConfigModel(
+                    uri: uriCtrl.text.trim(),
+                    user: userCtrl.text.trim(),
+                    password: passCtrl.text.trim(),
                   );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Errore di login o configurazione"),
-                    ),
-                  );
-                }
-              },
-              child: const Text('Salva'),
-            ),
+
+                  final ok = await ref
+                      .read(configProvider.notifier)
+                      .saveAndLogin(cfg);
+
+                  if (!mounted) return;
+
+                  if (ok) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LauncherPage(),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Errore di login o configurazione"),
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Salva'),
+              ),
           ],
         ),
       ),
