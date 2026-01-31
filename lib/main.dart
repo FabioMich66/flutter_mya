@@ -13,13 +13,22 @@ class LauncherApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final config = ref.watch(configProvider);
+    final configAsync = ref.watch(configProvider);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: config.isConfigured
-          ? const LauncherPage()
-          : const SetupPage(),
+      home: configAsync.when(
+        loading: () => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (err, _) => const SetupPage(),
+        data: (config) {
+          if (config == null) {
+            return const SetupPage();
+          }
+          return const LauncherPage();
+        },
+      ),
     );
   }
 }
