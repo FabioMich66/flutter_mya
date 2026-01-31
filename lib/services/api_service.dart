@@ -6,7 +6,7 @@ import '../models/config_model.dart';
 
 class ApiService {
   Future<String?> login(ConfigModel config) async {
-    final url = Uri.parse('${config.uri}/login');
+    final url = Uri.parse('${config.uri}/auth/login');
 
     final res = await http.post(url, body: {
       'email': config.user,
@@ -43,3 +43,4 @@ class ApiService {
         .toList();
   }
 }
+
