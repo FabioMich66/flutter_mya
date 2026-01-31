@@ -74,7 +74,7 @@ class LauncherController extends Notifier<LauncherState> {
 
 
   Future<void> refreshFromServer() async {
-    final cfg = ref.read(configProvider).config;
+    final cfg = ref.read(configProvider).value;
     if (cfg == null) return;
 
     final apps = await api.fetchApps(cfg);
@@ -95,5 +95,6 @@ class LauncherController extends Notifier<LauncherState> {
     state = LauncherState(apps: state.apps, order: newOrder);
   }
 }
+
 
 
