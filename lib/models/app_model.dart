@@ -1,10 +1,10 @@
-import '../utils/image_utils.dart';
+import 'dart:convert';
 
 class AppModel {
   final String id;
   final String name;
   final String url;
-  final String? iconDataUrl; // data URL base64
+  final String? iconDataUrl;
 
   AppModel({
     required this.id,
@@ -13,7 +13,6 @@ class AppModel {
     this.iconDataUrl,
   });
 
-  // MODEL → JSON
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
@@ -21,29 +20,23 @@ class AppModel {
         'icon': iconDataUrl,
       };
 
-  // JSON → MODEL
   factory AppModel.fromJson(Map<String, dynamic> json) {
     String? iconDataUrl;
 
     final icon = json['icon'];
 
-    if (icon != null) {
-      // Caso 1: il backend manda già una stringa base64
-      if (icon is String) {
-        iconDataUrl = icon;
-      }
+    if (icon != null &&
+        icon['data'] is String &&
+        icon['mime'] is String) {
 
-      // Caso 2: il backend manda un oggetto tipo Buffer (Node.js)
-      else if (icon is Map &&
-          icon['data'] is Map &&
-          icon['data']['data'] is List) {
-        final bytes = List<int>.from(icon['data']['data']);
-        iconDataUrl = ImageUtils.bytesToDataUrl(bytes);
-      }
+      final base64 = icon['data'];
+      final mime = icon['mime'];
+
+      iconDataUrl = "data:$mime;base64,$base64";
     }
 
     return AppModel(
-      id: json['id'].toString(),
+      id: json['_id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
       url: json['url']?.toString() ?? '',
       iconDataUrl: iconDataUrl,
