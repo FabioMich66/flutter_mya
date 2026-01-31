@@ -23,5 +23,29 @@ class ConfigModel {
       password: password ?? this.password,
       token: token ?? this.token,
     );
-    }
+  }
+
+  // ------------------------------------------------------------
+  // JSON → MODEL
+  // ------------------------------------------------------------
+  factory ConfigModel.fromJson(Map<String, dynamic> json) {
+    return ConfigModel(
+      uri: json['uri'],
+      user: json['user'],
+      password: json['password'],
+      token: json['token'],
+    );
+  }
+
+  // ------------------------------------------------------------
+  // MODEL → JSON
+  // ------------------------------------------------------------
+  Map<String, dynamic> toJson() {
+    return {
+      'uri': uri,
+      'user': user,
+      'password': password,
+      'token': token,
+    };
+  }
 }
